@@ -1,14 +1,14 @@
 module Zimbra
   class Directory
-    def self.search
-      DirectoryService.search
+    def self.search(offset)
+      DirectoryService.search(offset)
     end
   end
 
   class DirectoryService < HandsoapService
-    def search
+    def search(offset)
       xml = invoke("n2:SearchDirectoryRequest") do |message|
-          Builder.do_search(message, 50)
+          Builder.do_search(message, 25, offset)
       end
       return nil if soap_fault_not_found?
       Parser.get_all_response(xml)
@@ -22,8 +22,9 @@ module Zimbra
 
   class Builder
     class << self
-      def do_search(message,limitCount)
+      def do_search(message,limitCount, offset)
         message.add 'limit', limitCount
+        message.add 'offset', offset
         #message.add 'query', '(|(mail=*luigi*)(cn=*luigi*)(sn=*luigi*)(gn=*luigi*)(displayName=*luigi*)(zimbraMailDeliveryAddress=*luigi*))'
         #message.add 'query', '(mail=*al*)'
         message.add 'query', ''
