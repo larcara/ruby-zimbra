@@ -8,11 +8,16 @@ module Zimbra
   class DirectoryService < HandsoapService
     def search
       xml = invoke("n2:SearchDirectoryRequest") do |message|
-          Builder.do_search(message, 10)
+          Builder.do_search(message, 50)
       end
       return nil if soap_fault_not_found?
-      Parser.get_directory_response(xml)
+      Parser.get_all_response(xml)
     end
+
+    class Parser < Zimbra::AccountService::Parser
+
+    end
+
   end
 
   class Builder
@@ -20,7 +25,8 @@ module Zimbra
       def do_search(message,limitCount)
         message.add 'limit', limitCount
         #message.add 'query', '(|(mail=*luigi*)(cn=*luigi*)(sn=*luigi*)(gn=*luigi*)(displayName=*luigi*)(zimbraMailDeliveryAddress=*luigi*))'
-        message.add 'query', '(|(mail=*car*)(cn=*car*)(sn=*car*)(gn=*car*)(displayName=*car*)(zimbraMailDeliveryAddress=*car*))'
+        #message.add 'query', '(mail=*al*)'
+        message.add 'query', ''
       end
 
       def create(message, account)
@@ -71,6 +77,7 @@ module Zimbra
     end
   end
 
+=begin
   class Parser
     class << self
       def get_directory_response(response)
@@ -86,11 +93,11 @@ module Zimbra
         cos_id = Zimbra::A.read(node, 'zimbraCOSId')
         delegated_admin = Zimbra::A.read(node, 'zimbraIsDelegatedAdminAccount')
 
-        puts name
-
-        #Zimbra::Account.new(:id => id, :name => name, :acls => acls, :cos_id => cos_id, :delegated_admin => delegated_admin)
+        #puts name
+        Zimbra::Account.new(:id => id, :name => name, :acls => acls, :cos_id => cos_id, :delegated_admin => delegated_admin)
       end
     end
   end
+=end
 
 end
