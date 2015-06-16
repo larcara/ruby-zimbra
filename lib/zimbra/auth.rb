@@ -1,7 +1,7 @@
 module Zimbra
   class Auth
-    def self.login(username, password)
-      AuthService.login(username, password)
+    def self.login(username, password, http_options={})
+      AuthService.login(username, password, http_options)
     end
   end
 
@@ -17,8 +17,9 @@ module Zimbra
       response_namespaces(doc)
     end
 
-    def login(username, password)
-      xml = invoke('n2:AuthRequest') do |message|
+    def login(username, password, http_options)
+
+      xml = invoke('n2:AuthRequest',{ :soap_action => :auto, :http_options => http_options} ) do |message|
         Builder.auth(message, username, password)
       end
       Parser.auth_token(xml)
